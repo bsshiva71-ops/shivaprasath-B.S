@@ -1,0 +1,86 @@
+script.js
+
+function checkPassword() {
+    let password = document.getElementById("password").value;
+
+    let score = 0;
+    let suggestions = [];
+
+    // Length check
+    if (password.length >= 8) {
+        score++;
+    } else {
+        suggestions.push("Use at least 8 characters");
+    }
+
+    // Uppercase
+    if (/[A-Z]/.test(password)) {
+        score++;
+    } else {
+        suggestions.push("Add uppercase letter");
+    }
+
+    // Lowercase
+    if (/[a-z]/.test(password)) {
+        score++;
+    } else {
+        suggestions.push("Add lowercase letter");
+    }
+
+    // Number
+    if (/[0-9]/.test(password)) {
+        score++;
+    } else {
+        suggestions.push("Add a number");
+    }
+
+    // Special character
+    if (/[!@#$%^&*]/.test(password)) {
+        score++;
+    } else {
+        suggestions.push("Add special character (!@#$...)");
+    }
+
+    // Strength result
+    let strengthText = "";
+    if (score <= 2) {
+        strengthText = "Weak ❌";
+    } else if (score <= 4) {
+        strengthText = "Medium ⚠️";
+    } else {
+        strengthText = "Strong ✅";
+    }
+
+    document.getElementById("strength").innerText = "Strength: " + strengthText;
+
+    // Suggestions display
+    document.getElementById("suggestions").innerText =
+        suggestions.length > 0 ? "Suggestions: " + suggestions.join(", ") : "Good password 👍";
+
+    // Estimate crack time
+    let time = estimateCrackTime(password);
+    document.getElementById("time").innerText = "Estimated Crack Time: " + time;
+}
+
+
+// 🔐 Crack time estimation (simple logic)
+function estimateCrackTime(password) {
+    let charset = 0;
+
+    if (/[a-z]/.test(password)) charset += 26;
+    if (/[A-Z]/.test(password)) charset += 26;
+    if (/[0-9]/.test(password)) charset += 10;
+    if (/[!@#$%^&*]/.test(password)) charset += 10;
+
+    let combinations = Math.pow(charset, password.length);
+
+    let guessesPerSecond = 1000000; // 1 million guesses/sec
+    let seconds = combinations / guessesPerSecond;
+
+    if (seconds < 60) return "Few seconds ⚡";
+    if (seconds < 3600) return Math.floor(seconds / 60) + " minutes";
+    if (seconds < 86400) return Math.floor(seconds / 3600) + " hours";
+    if (seconds < 31536000) return Math.floor(seconds / 86400) + " days";
+
+    return Math.floor(seconds / 31536000) + " years 🔥";
+}
